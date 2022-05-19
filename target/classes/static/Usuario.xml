@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Usuario">
+
+	<sql id="selectUsuarioFragment">
+		select
+			cusu_llave as  llaveTabla
+			,cusu_login as  login
+			,cusu_nombre as  nombre
+			,cusu_clave as  clave
+			,cusu_email as  email
+			,dusu_expiracion as  expiracion
+			,cusu_estado as  estado
+			,cusu_grupoacceso as llaveGrupoAcceso
+			,cusu_claves as claves
+			,dusu_fechaclave as fechaClave
+			,nusu_intentos as intentos
+			,adicionado as adicionado
+			,fechaadicionado as fechaAdicionado
+			,modificado as modificado
+			,fechamodificado as fechaModificado
+			,cusu_pin as pin
+			,nusu_intentospregunta as intentosPregunta
+			,cusu_cambiarclave as cambiarClave
+			,cusu_documento as documento
+			,dusu_habilitar as fechaHabilitar
+		from usuariow_usu
+	</sql>
+
+	<sql id="whereUsuarioFragment">
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test=" llaveTabla != null"> 
+				and cusu_llave = #{llaveTabla}
+			</if>
+			<if test=" login != null"> 
+				and cusu_login = #{login}
+			</if>
+			<if test=" nombre != null"> 
+				and (upper(cusu_nombre) like upper(#{nombre}) or upper(cusu_login) like upper(#{nombre}))
+			</if>
+			<if test=" clave != null"> 
+				and cusu_clave = #{clave}
+			</if>
+			<if test=" email != null"> 
+				and cusu_email = #{email}
+			</if>
+			<if test=" expiracion != null"> 
+				and dusu_expiracion = #{expiracion}
+			</if>
+			<if test=" estado != null"> 
+				and cusu_estado = #{estado}
+			</if>
+			<if test=" llaveGrupoAcceso != null"> 
+				and cusu_grupoacceso = #{llaveGrupoAcceso}
+			</if>
+			<if test=" claves != null"> 
+				and cusu_claves = #{claves}
+			</if>
+			<if test=" fechaClave != null"> 
+				and dusu_fechaclave = #{fechaClave,jdbcType=TIMESTAMP}
+			</if>
+			<if test=" pin != null"> 
+				and cusu_pin 		= #{pin}
+			</if>
+			<if test=" intentosPregunta != null"> 
+				and nusu_intentospregunta = #{intentosPregunta}
+			</if>
+			<if test=" cambiarClave != null"> 
+				and cusu_cambiarclave=  #{cambiarClave}
+			</if>
+			<if test=" documento != null"> 
+				and cusu_documento =#{documento}
+			</if> 
+			<if test=" parametroBusqueda != null"> 
+				and ( upper(cusu_nombre) like upper(#{parametroBusqueda}) or
+				      upper(cusu_login) like upper(#{parametroBusqueda}) or 
+				      upper(cusu_documento) like upper(#{parametroBusqueda}) or
+				      upper(cusu_email) like upper(#{parametroBusqueda}) 
+				    )
+			</if>
+			<if test=" rolGrupal != null"> 
+					and cusu_llave in (
+						select cusg_usuario from usuariogrupow_usg where
+						cusg_grupo = #{rolGrupal}
+					)
+			</if>
+			<if test=" llaveEmpresa != null"> 
+				and cusu_llave in ( select cusg_usuario from usuariogrupow_usg where cusg_empresa = #{llaveEmpresa})		
+			</if>
+			<if test=" loginEmail != null"> 
+				and (cusu_login = #{loginEmail} or cusu_email = #{loginEmail})		
+			</if>
+		</trim>
+	</sql>
+
+
+	<sql id="whereUsuarioPrimaryKeyFragment">
+		where
+			cusu_llave	=#{llaveTabla,jdbcType=VARCHAR}
+	</sql>
+
+
+	<select id="consultarUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		<include refid="selectUsuarioFragment" />
+		<include refid="whereUsuarioFragment" />
+		order by cusu_login
+	</select>
+	
+	
+	<select id="consultarVistaUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		select
+			cusu_llave as  llaveTabla
+			,cusu_login as  login
+			,cusu_nombre as  nombre
+			,cusu_clave as  clave
+			,cusu_email as  email
+			,dusu_expiracion as  expiracion
+			,cusu_estado as  estado
+			,cusu_grupoacceso as llaveGrupoAcceso
+			,cusu_claves as claves
+			,dusu_fechaclave as fechaClave
+			,nusu_intentos as intentos
+			,documento as documento
+		from v_usuario
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test=" parametroBusqueda != null"> 
+				and ((upper(cusu_nombre) like upper(#{parametroBusqueda}) or upper(cusu_login) like upper(#{parametroBusqueda})) or (documento like #{parametroBusqueda})
+				or (upper(cusu_email) like upper(#{parametroBusqueda})))
+			</if>
+		</trim>
+		order by cusu_login
+	</select>
+	
+	
+	<!-- consulta el login y nombre de los usuarios con las llaves dadas -->
+	<select id="consultarNombresUsuariosLlave" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		select cusu_llave as  llaveTabla
+			,cusu_login as  login
+			,cusu_nombre as  nombre
+		from usuariow_usu
+		where cusu_llave in (${parametroBusqueda})
+	</select>
+	
+		
+	<select id="cantidadRegistrosVistaUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="int">
+		select	count(*)
+		from v_usuario
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test=" parametroBusqueda != null"> 
+				and ((upper(cusu_nombre) like upper(#{parametroBusqueda}) or upper(cusu_login) like upper(#{parametroBusqueda})) or (documento like #{parametroBusqueda}))
+			</if>
+		</trim>
+	</select>
+
+	<select id="cantidadRegistrosUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="int">
+		select count(*)
+		from usuariow_usu
+		<include refid="whereUsuarioFragment" />
+	</select>
+
+
+	<insert id="insertarUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		insert into usuariow_usu(
+			cusu_llave
+			,cusu_login
+			,cusu_nombre
+			,cusu_clave
+			,cusu_email
+			,dusu_expiracion
+			,cusu_estado
+			,cusu_grupoacceso
+			,cusu_claves
+			,dusu_fechaclave
+			,nusu_intentos
+			,adicionado
+			,fechaadicionado
+			,cusu_pin
+			,nusu_intentospregunta
+			,cusu_cambiarclave
+			,controlseguimiento
+			,cusu_documento
+			,dusu_habilitar
+		) values (
+			#{llaveTabla,jdbcType=VARCHAR}
+			,#{login,jdbcType=VARCHAR}
+			,#{nombre,jdbcType=VARCHAR}
+			,#{clave,jdbcType=VARCHAR}
+			,#{email,jdbcType=VARCHAR}
+			,#{expiracion,jdbcType=TIMESTAMP}
+			,#{estado,jdbcType=VARCHAR}
+			,#{llaveGrupoAcceso,jdbcType=VARCHAR}
+			,#{claves,jdbcType=VARCHAR}
+			,#{fechaClave,jdbcType=TIMESTAMP}
+			,#{intentos,jdbcType=NUMERIC}
+			,#{adicionado,jdbcType=VARCHAR}
+			,#{fechaAdicionado,jdbcType=TIMESTAMP}
+			,#{pin,jdbcType=VARCHAR}
+			,#{intentosPregunta,jdbcType=NUMERIC}
+			,#{cambiarClave,jdbcType=VARCHAR}
+			,#{controlSeguimiento,jdbcType=VARCHAR}
+			,#{documento,jdbcType=VARCHAR}
+			,#{fechaHabilitar,jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<update id="actualizarUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+			set
+				cusu_login	=#{login,jdbcType=VARCHAR},
+				cusu_nombre	=#{nombre,jdbcType=VARCHAR},
+				cusu_email	=#{email,jdbcType=VARCHAR},
+				dusu_expiracion	=#{expiracion,jdbcType=TIMESTAMP},
+				cusu_estado	=#{estado,jdbcType=VARCHAR},
+				cusu_grupoacceso =#{llaveGrupoAcceso,jdbcType=VARCHAR},
+				cusu_clave =#{clave,jdbcType=VARCHAR},
+				cusu_claves 	=#{claves,jdbcType=VARCHAR},
+				dusu_fechaclave =#{fechaClave,jdbcType=TIMESTAMP},
+				nusu_intentos = #{intentos,jdbcType=NUMERIC},
+				modificado = #{modificado,jdbcType=VARCHAR},
+				fechamodificado = #{fechaModificado,jdbcType=TIMESTAMP},
+				cusu_pin 		= #{pin,jdbcType=VARCHAR},
+				nusu_intentospregunta = #{intentosPregunta,jdbcType=NUMERIC},
+				cusu_cambiarclave= #{cambiarClave,jdbcType=VARCHAR},
+				controlseguimiento = #{controlSeguimiento,jdbcType=VARCHAR},
+				cusu_documento =#{documento,jdbcType=VARCHAR},
+				dusu_habilitar=#{fechaHabilitar,jdbcType=TIMESTAMP}
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</update>
+	
+	<update id="cambiarClave" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+			set
+				cusu_clave	=#{clave,jdbcType=VARCHAR},
+				cusu_claves 	=#{claves,jdbcType=VARCHAR},
+				dusu_fechaclave =#{fechaClave,jdbcType=TIMESTAMP},
+				cusu_cambiarclave=#{cambiarClave,jdbcType=VARCHAR},
+				nusu_intentos = 0,
+				nusu_intentospregunta = 0,
+				cusu_tokenRecuperacion = null,
+				controlseguimiento = #{controlSeguimiento,jdbcType=VARCHAR},
+				modificado = #{modificado,jdbcType=VARCHAR},
+				fechamodificado = #{fechaModificado,jdbcType=TIMESTAMP}
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</update>
+
+    <update id="incrementarIntentosPreguntas" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+		   set	nusu_intentospregunta = #{intentosPregunta,jdbcType=NUMERIC}
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</update>
+
+    <update id="cambiarCorreo" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+		   set cusu_email	=#{email,jdbcType=VARCHAR}
+		 where cusu_login = #{login,jdbcType=VARCHAR}
+	</update>
+	
+    <update id="adicionarTokenRecuperacion" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+		   set cusu_tokenrecuperacion =#{tokenRecuperacion,jdbcType=VARCHAR}
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</update>
+	
+	<select id="contarTokenRecuperacion" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="int">
+		select count(*)
+		from usuariow_usu
+		where cusu_login =#{login,jdbcType=VARCHAR}
+		and cusu_tokenrecuperacion =#{tokenRecuperacion,jdbcType=VARCHAR}  
+		
+	</select>
+	<select id="aceptoTerminosYCondiciones" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="java.lang.String">
+		select cusu_terminos
+		from usuariow_usu
+		where cusu_login =#{login,jdbcType=VARCHAR}
+	</select>
+	
+	<update id="actualizarTerminosYCondiciones" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+		   set cusu_terminos =#{terminosYCondiciones,jdbcType=VARCHAR},
+		       dusu_terminos =#{fechaTerminosYCondiciones,jdbcType=TIMESTAMP}
+		where cusu_login =#{login,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="eliminarUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		delete from usuariow_usu
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</delete>
+
+	<select id="ocultarCheckAyuda" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		select cusu_guiaayudainicio as checkAyuda
+		from usuariow_usu
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</select>
+	
+	<update id="actualizarCheckAyuda" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+		   set cusu_guiaAyudaInicio =#{checkAyuda,jdbcType=VARCHAR}
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</update>
+	
+	<update id="cambiarEstadoUsuario" parameterType="co.com.unionsoluciones.apirestservicios.dtos.UsuarioDTO">
+		update usuariow_usu
+		   set cusu_estado = #{estado,jdbcType=VARCHAR},
+		   		dusu_expiracion = #{expiracion,jdbcType=TIMESTAMP}
+		<include refid="whereUsuarioPrimaryKeyFragment" />
+	</update>
+	
+</mapper>

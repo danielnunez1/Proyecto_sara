@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="co.com.unionsoluciones.apirestservicios.mybatis.mapper.SaraMapper">
+
+	
+ 	<insert id="insertarNomina" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+        insert into nomina_nom
+        (	mnom_identifica, 
+			cnom_zonaeconomica, 
+			cnom_centrocosto, 
+			cnom_periodo, 
+			nnom_concepto, 
+			cnom_pago, 
+			cnom_unidad, 
+			fnom_valor1, 
+			fnom_valor2, 
+			fnom_valor3, 
+			dnom_pago, 
+			cnom_origen,
+			nnom_nivel, 
+			fnom_vacacion, 
+			fnom_ajuste,
+			fnom_ajusteaplica, 
+			cnom_lineacosto, 
+			fnom_fuera2, 
+			fnom_fuera3, 
+			cnom_periodoori, 
+			nnom_empresa, 
+			cnom_entidad,
+			cnom_adicionado,
+			dnom_adicionado,
+			controlseguimiento,
+			fnom_manualaplica,
+			fnom_manual,
+			fnom_manualeml,
+			cnom_presupuestal
+		)
+        values
+	        (	#{contrato,jdbcType=NUMERIC},
+				#{zonaPK,jdbcType=VARCHAR},
+				#{centroPK,jdbcType=VARCHAR},
+				#{periodo,jdbcType=VARCHAR},
+				#{concepto,jdbcType=NUMERIC},
+				#{pago,jdbcType=VARCHAR},
+				#{unidadPK,jdbcType=VARCHAR},
+				#{valorConcepto,jdbcType=NUMERIC},
+				#{valorBase,jdbcType=NUMERIC},
+				#{valorTercero,jdbcType=NUMERIC},
+				#{fechaPago,jdbcType=TIMESTAMP},
+				#{origen,jdbcType=VARCHAR},
+				#{nivelCalculo,jdbcType=NUMERIC},
+				#{valorConceptoFuera,jdbcType=NUMERIC},
+				#{valorConceptoAjuste,jdbcType=NUMERIC},
+				#{valorAjusteAplica,jdbcType=NUMERIC},
+				#{lineaPK,jdbcType=VARCHAR},
+				#{valorBaseFuera,jdbcType=NUMERIC},
+				#{fueraTercero,jdbcType=NUMERIC},
+				#{periodoOrigen,jdbcType=VARCHAR},
+				#{empresa,jdbcType=NUMERIC},
+				#{entidadPK,jdbcType=VARCHAR},
+				#{adicionado,jdbcType=VARCHAR},
+				#{fechaAdicionado,jdbcType=DATE},
+				#{controlSeguimiento,jdbcType=VARCHAR},
+				#{manualAplica,jdbcType=NUMERIC},
+				#{manual,jdbcType=NUMERIC},
+				#{manualEmpleado,jdbcType=NUMERIC},
+				#{presupuestal,jdbcType=VARCHAR}
+		)	
+    </insert>
+    
+    <sql id="whereNominaEmpleado">
+
+		and cnom_origen ='I'
+ 		<if test=" contrato != null"> 
+ 			and mnom_identifica    =	#{contrato}
+ 		</if>
+ 		<if test=" zonaPK != null"> 
+ 			and cnom_zonaeconomica =	#{zonaPK}
+ 		</if>
+ 		<if test=" centroPK != null"> 
+ 			and cnom_centrocosto   =	#{centroPK}
+ 		</if>
+ 		<if test=" periodoOrigen != null"> 
+ 			and cnom_periodoori     =	#{periodoOrigen}
+ 		</if>
+ 		<if test=" pago != null"> 
+ 			and cnom_pago          =	#{pago}
+ 		</if>
+ 		<if test=" periodo != null"> 
+ 			and cnom_periodo       =	#{periodo}
+ 		</if>
+ 		<if test=" concepto != null"> 
+ 			and nnom_concepto      =	 	#{concepto}
+ 		</if>
+ 		<if test=" empresa != null"> 
+ 			and nnom_empresa       =	#{empresa}
+ 		</if>
+ 		<if test=" entidadPK != null"> 
+ 			and cnom_entidad       =	#{entidadPK}
+ 		</if>
+ 		<if test=" lineaPK != null"> 
+ 			and cnom_lineacosto    =	#{lineaPK}
+ 		</if>
+ 		<if test=" origenPO != null"> 
+ 			and cnom_origen    in ('P','O')
+ 		</if>
+ 		<if test=" origen != null"> 
+ 			and cnom_origen    = #{origen}
+ 		</if>  		  		
+ 		<if test=" diferenteFlexible != null"> 
+	 		and ccon_flexible  <![CDATA[ <> ]]> 'C'
+	 	</if>
+   	 	<if test=" presupuestal != null"> 
+ 			and cnom_presupuestal    =	#{presupuestal}
+ 		</if>
+    </sql>
+    
+	<sql id="whereNominaPrimaryKeyFragment">
+        where 
+					mnom_identifica    =	#{contrato,jdbcType=NUMERIC}
+					and  cnom_zonaeconomica =	#{zonaPK,jdbcType=VARCHAR}
+					and  cnom_centrocosto   =	#{centroPK,jdbcType=VARCHAR}
+					and  cnom_periodoori    =	#{periodoOrigen,jdbcType=VARCHAR}
+					and  cnom_pago          =	#{pago,jdbcType=VARCHAR}
+					and  cnom_periodo       =	#{periodo,jdbcType=VARCHAR}
+					and  nnom_concepto      =	#{concepto,jdbcType=NUMERIC}
+					and  nnom_empresa       =	#{empresa,jdbcType=NUMERIC}
+					and  cnom_entidad       =	#{entidadPK,jdbcType=VARCHAR}
+					and  cnom_lineacosto    =	#{lineaPK,jdbcType=VARCHAR}
+					and  cnom_presupuestal  =   #{presupuestal,jdbcType=VARCHAR}
+	</sql>
+
+	<sql id="selectNominaFragment">
+  		select 	
+					mnom_identifica    as contrato,
+					cnom_zonaeconomica as zonaPK,
+					cnom_centrocosto   as centroPK,
+					cnom_periodo       as periodo,
+					nnom_concepto      as concepto,
+					ccon_codigo		   as codigoConcepto,
+					cnom_pago          as pago,
+					cnom_unidad        as unidadPK,
+					fnom_valor1        as valorConcepto,
+					fnom_valor2        as valorBase,
+					fnom_valor3        as valorTercero,
+					fnom_manual        as manual,
+					fnom_manualeml     as manualEmpleado,
+					fnom_manualaplica  as manualAplica,
+					dnom_pago          as fechaPago,
+					cnom_origen        as origen,
+					nnom_nivel         as nivelCalculo,
+					fnom_vacacion      as valorConceptoFuera,
+					fnom_ajuste        as valorConceptoAjuste,
+	                fnom_ajusteaplica as valorAjusteAplica,
+					cnom_lineacosto    as lineaPK,
+					fnom_fuera2        as valorBaseFuera,
+					fnom_fuera3        as fueraTercero,
+					cnom_periodoori    as periodoOrigen,
+					nnom_empresa       as empresa,
+					cnom_entidad       as entidadPK	,
+					cnom_presupuestal  as presupuestal,
+					ccon_tipo          as conceptoTipo,
+                    ccon_formula       as conceptoFormulaValor,
+                    ccon_tiposervicio  as conceptoTipoServicio,
+                    ccon_descripcion   as conceptoNombre,
+                    (select ctis_unico
+                     from tiposervicio_tis
+                     where ctis_tiposervicio = concepto_con.ccon_tiposervicio) as unico,
+                     dnom_adicionado as fechaAdicionado,
+                     cnom_adicionado as adicionado,
+                     dnom_modificado as fechaModificado,
+                     cnom_modificado as modificado,
+                    (select cent_descripcion 
+                       from entidad_ent 
+                      where nomina_nom.cnom_entidad = entidad_ent.cent_entidad) as entidadNombre,
+                    (select max(ccne_descripcion) 
+                       from conceptoempres_cne
+                      where ncne_concepto = nomina_nom.nnom_concepto  
+                      and ncne_empresa = nomina_nom.nnom_empresa) as conceptoEmpresa
+			from    nomina_nom , concepto_con
+			where 	nnom_concepto = ncon_concepto
+	</sql>
+    <update id="actualizarNomina" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+        update nomina_nom
+           set  	mnom_identifica    =	#{contrato,jdbcType=NUMERIC},
+					cnom_zonaeconomica =	#{zonaPK,jdbcType=VARCHAR},
+					cnom_centrocosto   =	#{centroPK,jdbcType=VARCHAR},
+					cnom_periodo       =	#{periodo,jdbcType=VARCHAR},
+					nnom_concepto      =	#{concepto,jdbcType=NUMERIC},
+					cnom_pago          =	#{pago,jdbcType=VARCHAR},
+					cnom_unidad        =	#{unidadPK,jdbcType=VARCHAR},
+					fnom_valor1        =	#{valorConcepto,jdbcType=NUMERIC},
+					fnom_valor2        =	#{valorBase,jdbcType=NUMERIC},
+					fnom_valor3        =	#{valorTercero,jdbcType=NUMERIC},
+					dnom_pago          =	#{fechaPago,jdbcType=TIMESTAMP},
+					cnom_origen        =	#{origen,jdbcType=VARCHAR},
+					nnom_nivel         =	#{nivelCalculo,jdbcType=NUMERIC},
+					fnom_vacacion      =	#{valorConceptoFuera,jdbcType=NUMERIC},
+					fnom_ajuste        =	#{valorConceptoAjuste,jdbcType=NUMERIC},
+					fnom_ajusteaplica  =    #{valorAjusteAplica,jdbcType=NUMERIC},
+					cnom_lineacosto    =	#{lineaPK,jdbcType=VARCHAR},
+					fnom_fuera2        =	#{valorBaseFuera,jdbcType=NUMERIC},
+					fnom_fuera3        =	#{fueraTercero,jdbcType=NUMERIC},
+					cnom_periodoori    =	#{periodoOrigen,jdbcType=VARCHAR},
+					nnom_empresa       =	#{empresa,jdbcType=NUMERIC},
+					cnom_entidad       =	#{entidadPK,jdbcType=VARCHAR},
+					controlseguimiento =    #{controlSeguimiento,jdbcType=VARCHAR},
+					dnom_modificado    = 	#{fechaModificado,jdbcType=TIMESTAMP},
+					cnom_modificado    = 	#{modificado,jdbcType=VARCHAR},
+					fnom_manual        =    #{manual,jdbcType=NUMERIC}
+		<include refid="whereNominaPrimaryKeyFragment" />
+   	</update> 
+	
+	<update id="actualizarNominaEntidadUnica" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+            update nomina_nom
+               set cnom_entidad = #{entidadPK,jdbcType=VARCHAR},
+                   controlseguimiento = #{controlSeguimiento,jdbcType=VARCHAR},
+                   dnom_modificado  = #{fechaModificado,jdbcType=TIMESTAMP},
+			       cnom_modificado = #{modificado,jdbcType=VARCHAR}
+             where mnom_identifica = #{contrato,jdbcType=NUMERIC}
+			   and nnom_empresa    = #{empresa,jdbcType=NUMERIC}
+			   and cnom_entidad   != #{entidadPK,jdbcType=VARCHAR}
+			   and cnom_pago    in ('N','X')
+			   and cnom_periodo in ( select cper_periodo
+	                                  from periodo_per
+								     where nper_empresa = #{empresa,jdbcType=NUMERIC}
+								       and cper_generada in ('N','P')
+									   and (dper_final >= #{fechaAfiliacion,jdbcType=TIMESTAMP}
+									   		or #{fechaAfiliacion,jdbcType=TIMESTAMP} between dper_inicial and dper_final))
+	           and nnom_concepto in ( select ncon_concepto
+	                                    from concepto_con
+									   where ccon_tiposervicio = #{tipoServicio,jdbcType=VARCHAR})
+            
+	</update> 
+	
+	<delete id="eliminarNomina" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+		delete from nomina_nom
+		<include refid="whereNominaPrimaryKeyFragment" />
+	</delete>		
+
+ 	<select id="consultarNomina"  parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+		<include refid="selectNominaFragment" />
+		 <include refid="whereNominaEmpleado"/>    
+		     order by ncon_concepto
+ 	</select>
+ 	
+ 	<select id="cantidadNominaRetirado"  parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" resultType="int">	
+  		select count(*)
+		  from nomina_nom
+		 where cnom_pago='N'
+		   and mnom_identifica = #{contrato}
+		   and cnom_periodo = #{periodo}
+		   and nnom_empresa = #{empresa}
+ 	</select>
+ 	
+ 	<select id="traerConceptoLiquidados" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+ 		     select mnom_identifica    as contrato,
+					cnom_zonaeconomica as zonaPK,
+					cnom_centrocosto   as centroPK,
+					cnom_periodo       as periodo,
+					nnom_concepto      as concepto,
+					cnom_pago          as pago,
+					cnom_unidad        as unidadPK,
+					fnom_valor1        as valorConcepto,
+					fnom_valor2        as valorBase,
+					fnom_valor3        as valorTercero,
+					dnom_pago          as fechaPago,
+					cnom_origen        as origen,
+					nnom_nivel         as nivelCalculo,
+					fnom_vacacion      as valorConceptoFuera,
+					fnom_ajuste        as valorConceptoAjuste,
+		            fnom_ajusteaplica as valorAjusteAplica,
+					cnom_lineacosto    as lineaPK,
+					fnom_fuera2        as valorBaseFuera,
+					fnom_fuera3        as fueraTercero,
+					cnom_periodoori    as periodoOrigen,
+					nnom_empresa       as empresa,
+					cnom_entidad       as entidadPK,
+					cnom_presupuestal  as presupuestal,
+					ccon_formula       as conceptoFormulaValor
+	   	        from periodoemplead_pee, periodo_per, nomina_nom, concepto_con 
+			     where mpee_identifica = #{contrato}
+				   and npee_empresa    = #{empresa}
+				   and npee_empresa    = nper_empresa
+				   and cpee_periodo    = cper_periodo
+				   and dper_final       <![CDATA[ >= ]]>  #{fechaPago,jdbcType=TIMESTAMP}
+				   and cper_generada    in ('P','N')
+				   and npee_empresa     = nnom_empresa 
+			       and mpee_identifica  = mnom_identifica 
+			       and cpee_periodo     = cnom_periodo 
+			       and nnom_concepto    = #{concepto}
+			       and ncon_concepto    =  nnom_concepto
+			       and cper_liquidacion = cnom_pago
+			       and ccon_formula     = #{conceptoFormulaValor}
+				   and fnom_valor1      != #{valorConcepto} 
+ 	</select>
+ 		
+ 	<select id="cantidadRegistrosNomina" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" resultType="int">
+ 		select count(*)
+ 		  from nomina_nom , concepto_con 
+	     where nnom_concepto = ncon_concepto
+		 <include refid="whereNominaEmpleado"/> 
+ 	</select>
+	
+   	<select id="conceptoPersona" resultType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+	 		select 
+		       nnom_concepto as concepto,    
+		       ccon_descripcion as conceptoNombre,
+		       sum(fvalor) as  valorPagado,
+		       sum(fbase) as valorBase,
+		       ccon_tipo as tipoConcepto
+		from (
+		select nnom_concepto, 
+		       ccon_descripcion,  
+		       case when cnom_pago= 'G' then fnom_vacacion else fnom_valor1 +fnom_ajusteaplica + fnom_ajuste - fnom_vacacion end fvalor,
+		       case when cnom_pago= 'G' then fnom_fuera2 else  fnom_valor2 - fnom_fuera2 end fbase,
+		       ccon_tipo
+		  from nomina_nom, concepto_con, entidad_ent, datobasicoemp_dbe, periodo_per
+		 where nnom_concepto   = ncon_concepto
+		   and cnom_entidad    = cent_entidad
+		   and nnom_empresa    = ndbe_empresa
+		   and nnom_empresa    = #{empresa}
+		   and mnom_identifica = #{contrato}
+		   and cnom_periodo    = cper_periodo
+		   and nnom_empresa    = nper_empresa
+		   and dper_pago       = #{fechaPago}
+		   and cnom_pago       in ('N','X','G')
+		   and nnom_concepto not in (ndbe_pagovacacion,ndbe_anticipovaca,ndbe_pagoregresion)
+		   and ccon_flexible  <![CDATA[ <> ]]> 'C'
+		union all
+		select naud_concepto,
+		       ccon_descripcion,
+		       faud_valor,
+		       faud_valor2,
+		       ccon_tipo
+		  from ausencia_aus, ausenciadato_aud, concepto_con, entidad_ent, datobasicoemp_dbe, periodo_per
+		 where caud_ausencia = caus_llave
+		   and naud_concepto    = ncon_concepto
+		   and caud_entidad     = cent_entidad
+		   and naus_empresa     = ndbe_empresa
+		   and naus_empresa     =#{empresa}
+		   and maus_contrato = #{contrato}
+		   and caus_periodo     = cper_periodo
+		   and naus_empresa    = nper_empresa
+		   and dper_pago       = #{fechaPago}
+		   and naud_numerolip   = 0
+		   and caud_variableliq = '.'
+		   and ccon_flexible  <![CDATA[ <> ]]> 'C'
+		   and caus_formapago = 'N'
+		) datobase
+		group by nnom_concepto, 
+		         ccon_descripcion,
+		         ccon_tipo
+		having sum(fvalor)  <![CDATA[ <> ]]> 0 or sum(fbase)  <![CDATA[ <> ]]> 0
+		order by concepto
+   </select>
+   
+	<select id="consultarTotalConcepto"  parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">   	
+	   	select sum (case when ccon_tipo = '+' then fnom_valor1 else 0 end) as totalDevengo,
+			   sum (case when ccon_tipo = '-' then fnom_valor1 else 0 end ) as totalDeducido
+		from    nomina_nom , concepto_con 
+		where 	nnom_concepto = ncon_concepto
+	 	<include refid="whereNominaEmpleado"/>    
+	 </select>
+	 
+	   <select id="traerConceptoEntidadEmpleado" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO" resultType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+   		select mnom_identifica    as contrato, 
+   		   	   cnom_periodo as periodo,
+   			   nnom_concepto as concepto,
+   			   nnom_empresa       as empresa,
+   			   cnom_zonaeconomica as zonaPK,
+			   cnom_centrocosto   as centroPK,
+			   cnom_lineacosto    as lineaPK,
+			   cnom_pago as pago,
+			   cnom_entidad as entidadPK,
+   			   cnom_periodoori    as periodoOrigen,
+			   cnom_presupuestal  as presupuestal,
+   			   ccon_descripcion as conceptoNombre,
+   			   (select cent_descripcion
+   			   		from entidad_ent 
+                    where nomina_nom.cnom_entidad = entidad_ent.cent_entidad) as entidadNombre
+		  from nomina_nom, concepto_con, periodo_per, tiposervicio_tis
+		 where nnom_concepto = ncon_concepto
+		   and ctis_tiposervicio = ccon_tiposervicio
+		   and ctis_unico = 'S'
+		   and nnom_empresa = nper_empresa
+		   and cnom_periodo = cper_periodo
+		   and nnom_empresa = #{empresa}
+		   and mnom_identifica = #{contrato}
+		   and ccon_tiposervicio = #{tipoServicio}
+		   and dper_inicial <![CDATA[ >= ]]>  #{fechaAfiliacion,jdbcType=TIMESTAMP}
+		   and cnom_entidad != #{entidadPK}
+   </select>
+
+	<update id="actualizarControlSeguimiento" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+  	    update nomina_nom											
+           set controlseguimiento = #{controlSeguimiento,jdbcType=VARCHAR}									
+		<include refid="whereNominaPrimaryKeyFragment" />
+  	</update>
+  	
+  	<update id="actualizarEntidadNomina" parameterType="co.com.unionsoluciones.apirestservicios.dtos.NominaEmpleadoDTO">
+        update nomina_nom
+           set cnom_entidad = #{entidadAux,jdbcType=VARCHAR},
+               controlseguimiento = #{controlSeguimiento,jdbcType=VARCHAR},
+               dnom_modificado  = #{fechaModificado,jdbcType=TIMESTAMP},
+		       cnom_modificado = #{modificado,jdbcType=VARCHAR}									
+		<include refid="whereNominaPrimaryKeyFragment" />
+  	</update>
+
+</mapper>

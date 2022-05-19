@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.com.unionsoluciones.apirestservicios.mybatis.mapper.UsuarioMapper">
+
+    <select id="myQueryByNombre" resultType="co.com.unionsoluciones.apirestservicios.models.UsuarioModel">
+        SELECT * FROM usuario WHERE nombre = #{nombreParametro}
+    </select>
+
+    <select id="myQueryByUsuario" resultType="co.com.unionsoluciones.apirestservicios.models.UsuarioModel">
+        SELECT * FROM usuario WHERE usuario = #{usuarioParametro}
+    </select>
+
+    <select id="lastIdUsuario" resultType="java.lang.Integer">
+        SELECT max(id) FROM usuario
+    </select>
+
+    <insert id="insert">
+        INSERT
+            INTO
+                usuario (id, nombre, apellido, empresa, usuario, clave, roles, estado, conexion)
+            VALUES( #{id}, #{nombre}, #{apellido}, #{empresa}, #{usuario}, #{clave}, #{roles}, #{estado}, #{conexion} )
+    </insert>
+
+    <select id="myQueryByIdUsuarioHijo" resultType="co.com.unionsoluciones.apirestservicios.models.UsuarioModel">
+        SELECT * FROM usuario WHERE id between #{limInferior} and #{limSuperior}
+    </select>
+
+</mapper>
